@@ -2,7 +2,7 @@
 id: ticket-006
 title: Slim AGENTS.md and adopt ADR index
 plan: workflow-hardening
-status: todo
+status: done
 type: docs
 priority: low
 estimate: S

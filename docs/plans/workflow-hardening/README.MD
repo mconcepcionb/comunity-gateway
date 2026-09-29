@@ -2,7 +2,7 @@
 id: workflow-hardening
 title: Workflow Hardening
 kind: meta
-status: active
+status: done
 owner: marce
 created: 2026-09-29
 updated: 2026-09-29
@@ -52,7 +52,7 @@ gate, and a defined home for meta/tooling work.
 | ticket-003 | Ticket lifecycle helpers | done | ticket-002 |
 | ticket-004 | Commit hooks and changelog | done | ticket-002 |
 | ticket-005 | Stronger quality gates | done | ticket-002 |
-| ticket-006 | Slim AGENTS.md and adopt ADR index | todo | ticket-002 |
+| ticket-006 | Slim AGENTS.md and adopt ADR index | done | ticket-002 |
 
 ## Risks
 
@@ -62,3 +62,4 @@ gate, and a defined home for meta/tooling work.
 ## Diary links
 
 - `docs/diary/entry-2026-09-29-workflow-bootstrap.md`
+- `docs/diary/entry-2026-09-29-workflow-hardening.md`
