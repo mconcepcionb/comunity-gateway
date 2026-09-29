@@ -3,6 +3,7 @@ version: '3'
 vars:
   GO: '{{.GO | default "go"}}'
   GOLANGCI: '{{.GOLANGCI | default "golangci-lint"}}'
+  WORKFLOW: 'go run ./tools/workflow/main.go'
 
 tasks:
   default:
@@ -52,6 +53,21 @@ tasks:
     desc: Tidy go.mod
     cmds:
       - '{{.GO}} mod tidy'
+
+  verify:
+    desc: Validate workflow artifacts (frontmatter, dependencies, indexes)
+    cmds:
+      - '{{.WORKFLOW}} verify'
+
+  plan:sync:
+    desc: Regenerate plan ticket indexes from ticket frontmatter
+    cmds:
+      - '{{.WORKFLOW}} plan-sync'
+
+  adr:index:
+    desc: Regenerate docs/adr/README.md
+    cmds:
+      - '{{.WORKFLOW}} adr-index'
 
   new-adr:
     desc: 'Create an ADR: task new-adr title="..."'

@@ -52,27 +52,27 @@ administrator manages members, links, game servers and rules from the admin cons
 
 ## Tickets
 
-| ID         | Title                                              | Status | Depends on        |
-|------------|----------------------------------------------------|--------|-------------------|
-| ticket-001 | Repository scaffold and quality tooling            | todo   |                   |
-| ticket-002 | Platform: configuration, logging, database         | todo   | ticket-001        |
-| ticket-003 | Spike: AzerothCore whisper capture                 | todo   | ticket-001        |
-| ticket-004 | Events: in-process bus and transactional outbox    | todo   | ticket-002        |
-| ticket-005 | Identity: account and external-identity model      | todo   | ticket-002        |
-| ticket-006 | Identity: Discord login and JWT issuance           | todo   | ticket-005        |
-| ticket-007 | Identity: link Google and Steam identities         | todo   | ticket-006        |
-| ticket-008 | HTTP API: router, OpenAPI contract, auth middleware| todo   | ticket-006        |
-| ticket-009 | Games: GameServer port and domain model            | todo   | ticket-002        |
-| ticket-010 | Games: AzerothCore adapter                         | todo   | ticket-003, 009   |
-| ticket-011 | Games: character verification flow                 | todo   | ticket-004,006,010|
-| ticket-012 | Gamification: points, achievements, rules engine   | todo   | ticket-004        |
-| ticket-013 | Gamification: event wiring and golden tests        | todo   | ticket-011, 012   |
-| ticket-014 | Widgets: HTML-to-PNG activity widget               | todo   | ticket-004        |
-| ticket-015 | Console: Next.js scaffold with authentication      | todo   | ticket-006, 008   |
-| ticket-016 | Console: members, links and game servers           | todo   | ticket-015, 011   |
-| ticket-017 | Console: points and gamification rules             | todo   | ticket-015, 013   |
-| ticket-018 | Integration test: real AzerothCore end to end      | todo   | ticket-010,011,013|
-| ticket-019 | Docs: publish OpenAPI and finalize README          | todo   | ticket-008, 017   |
+| ID | Title | Status | Depends on |
+|----|-------|--------|------------|
+| ticket-001 | Repository scaffold and quality tooling | todo |  |
+| ticket-002 | Platform: configuration, logging and database | todo | ticket-001 |
+| ticket-003 | Spike: AzerothCore whisper capture | todo | ticket-001 |
+| ticket-004 | Events: in-process bus and transactional outbox | todo | ticket-002 |
+| ticket-005 | Identity: account and external-identity model | todo | ticket-002 |
+| ticket-006 | Identity: Discord login and JWT issuance | todo | ticket-005 |
+| ticket-007 | Identity: link Google and Steam identities | todo | ticket-006 |
+| ticket-008 | HTTP API: router, OpenAPI contract and auth middleware | todo | ticket-006 |
+| ticket-009 | Games: GameServer port and domain model | todo | ticket-002 |
+| ticket-010 | Games: AzerothCore adapter | todo | ticket-003, ticket-009 |
+| ticket-011 | Games: character verification flow | todo | ticket-004, ticket-006, ticket-010 |
+| ticket-012 | Gamification: points, achievements and rules engine | todo | ticket-004 |
+| ticket-013 | Gamification: event wiring and golden tests | todo | ticket-011, ticket-012 |
+| ticket-014 | Widgets: HTML-to-PNG activity widget | todo | ticket-004 |
+| ticket-015 | Console: Next.js scaffold with authentication | todo | ticket-006, ticket-008 |
+| ticket-016 | Console: members, links and game servers | todo | ticket-015, ticket-011 |
+| ticket-017 | Console: points and gamification rules | todo | ticket-015, ticket-013 |
+| ticket-018 | Integration test: real AzerothCore end to end | todo | ticket-010, ticket-011, ticket-013 |
+| ticket-019 | Docs: publish OpenAPI and finalize README | todo | ticket-008, ticket-017 |
 
 ## Risks
 

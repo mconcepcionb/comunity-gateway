@@ -48,7 +48,7 @@ gate, and a defined home for meta/tooling work.
 | ID | Title | Status | Depends on |
 |----|-------|--------|------------|
 | ticket-001 | Add meta plan kind and spike output rule | done |  |
-| ticket-002 | Workflow validator and index generation | todo | ticket-001 |
+| ticket-002 | Workflow validator and index generation | done | ticket-001 |
 | ticket-003 | Ticket lifecycle helpers | todo | ticket-002 |
 | ticket-004 | Commit hooks and changelog | todo | ticket-002 |
 | ticket-005 | Stronger quality gates | todo | ticket-002 |

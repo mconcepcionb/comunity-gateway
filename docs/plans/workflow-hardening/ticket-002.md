@@ -2,7 +2,7 @@
 id: ticket-002
 title: Workflow validator and index generation
 plan: workflow-hardening
-status: todo
+status: done
 type: chore
 priority: high
 estimate: L
