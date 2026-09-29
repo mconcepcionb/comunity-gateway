@@ -43,7 +43,7 @@ tasks:
     vars:
       MIN: '{{.COVERAGE_MIN | default "60"}}'
     cmds:
-      - '{{.GO}} test -race -coverprofile=coverage.out -covermode=atomic ./...'
+      - 'if [ "$({{.GO}} env CGO_ENABLED)" = "1" ]; then {{.GO}} test -race -coverprofile=coverage.out -covermode=atomic ./...; else {{.GO}} test -coverprofile=coverage.out -covermode=atomic ./...; fi'
       - '{{.WORKFLOW}} coverage coverage.out {{.MIN}}'
 
   console:
@@ -75,9 +75,9 @@ tasks:
       - '{{.GOLANGCI}} run'
 
   test:
-    desc: Run Go tests with the race detector
+    desc: Run Go tests (with the race detector when cgo is available)
     cmds:
-      - '{{.GO}} test -race ./...'
+      - 'if [ "$({{.GO}} env CGO_ENABLED)" = "1" ]; then {{.GO}} test -race ./...; else {{.GO}} test ./...; fi'
 
   build:
     desc: Build all packages (injects the version)

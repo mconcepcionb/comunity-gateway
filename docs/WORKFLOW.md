@@ -103,10 +103,10 @@ must follow it (see `AGENTS.md`), and humans are expected to as well.
 
 ## Quality gates
 
-`task check` runs `fmt` + `vet` + `lint` + `test` (with `-race`) and the workflow tool's tests.
-`task check:ci` adds `task verify`, the path-filtered `console` gate and `govulncheck`. `task
-coverage` enforces a coverage floor (`COVERAGE_MIN`, default 60). Every ticket's Definition of Done
-must include: tests added/updated, docs updated, and the gates green.
+`task check` runs `fmt` + `vet` + `lint` + `test` (with `-race` where cgo is available; CI runs it)
+and the workflow tool's tests. `task check:ci` adds `task verify`, the path-filtered `console` gate
+and `govulncheck`. `task coverage` enforces a coverage floor (`COVERAGE_MIN`, default 60). Every
+ticket's Definition of Done must include: tests added/updated, docs updated, and the gates green.
 
 ## Tooling
 

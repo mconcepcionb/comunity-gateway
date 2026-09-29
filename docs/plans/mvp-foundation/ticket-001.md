@@ -2,7 +2,7 @@
 id: ticket-001
 title: Repository scaffold and quality tooling
 plan: mvp-foundation
-status: todo
+status: done
 type: chore
 priority: high
 estimate: M

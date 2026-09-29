@@ -180,6 +180,8 @@ comunity-gateway/
   deploy/                 # docker-compose (gateway, postgres, azerothcore)
 ```
 
+Go module path: `github.com/marcelinocb/comunity-gateway`.
+
 ## Testing
 
 - Unit tests per module, with fakes at module boundaries.

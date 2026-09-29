@@ -54,7 +54,7 @@ administrator manages members, links, game servers and rules from the admin cons
 
 | ID | Title | Status | Depends on |
 |----|-------|--------|------------|
-| ticket-001 | Repository scaffold and quality tooling | todo |  |
+| ticket-001 | Repository scaffold and quality tooling | done |  |
 | ticket-002 | Platform: configuration, logging and database | todo | ticket-001 |
 | ticket-003 | Spike: AzerothCore whisper capture | todo | ticket-001 |
 | ticket-004 | Events: in-process bus and transactional outbox | todo | ticket-002 |
