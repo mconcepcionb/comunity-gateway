@@ -11,6 +11,10 @@ rules live in `docs/WORKFLOW.md`, which is the single source of truth.
 
 ## Invariants
 
+- **Ask before deciding.** For important decisions about architecture or tooling, present options and
+  wait for a decision instead of choosing unilaterally.
+- **Follow convention, but don't guess in uncharted territory.** Apply existing conventions, ADRs
+  and surrounding patterns; when nothing covers the case, stop and ask rather than invent.
 - All work lives in a plan; tooling/workflow changes use a `kind: meta` plan.
 - A non-trivial decision produces an ADR. Accepted ADRs are immutable; supersede, never edit.
 - Tickets are atomic, with an explicit Definition of Done and Quality Gates. Do not start a ticket
