@@ -86,9 +86,10 @@ must follow it (see `AGENTS.md`), and humans are expected to as well.
 
 ## Quality gates
 
-`task check` runs `fmt` + `vet` + `lint` + `test`. When the console is touched, frontend gates
-(`eslint`, `tsc`) run too. Every ticket's Definition of Done must include: tests added/updated,
-docs updated, and `task check` green.
+`task check` runs `fmt` + `vet` + `lint` + `test` (with `-race`) and the workflow tool's tests.
+`task check:ci` adds `task verify`, the path-filtered `console` gate and `govulncheck`. `task
+coverage` enforces a coverage floor (`COVERAGE_MIN`, default 60). Every ticket's Definition of Done
+must include: tests added/updated, docs updated, and the gates green.
 
 ## Tooling
 
@@ -96,7 +97,10 @@ Go 1.27+, `golangci-lint` v2, [Task](https://taskfile.dev) (go-task), Node 26+, 
 
 ```
 task               # list tasks
-task check         # fmt + vet + lint + test
+task check         # fmt + vet + lint + test (-race)
+task check:ci      # check + verify + console + govulncheck
+task coverage      # tests with coverage floor (COVERAGE_MIN)
+task console       # lint/typecheck the console (path-filtered)
 task fmt vet lint test build run tidy
 task verify        # validate workflow artifacts
 task plan:sync     # regenerate plan indexes

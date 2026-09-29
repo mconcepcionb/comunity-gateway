@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"os"
@@ -934,6 +935,56 @@ func runVerifyCommits(repo, rng string) int {
 	return 0
 }
 
+// ---------- coverage ----------
+
+// coveragePercent computes statement coverage from a Go cover profile.
+func coveragePercent(profile string) (float64, error) {
+	f, err := os.Open(profile)
+	if err != nil {
+		return 0, err
+	}
+	defer f.Close()
+	total, covered := 0, 0
+	sc := bufio.NewScanner(f)
+	for sc.Scan() {
+		line := sc.Text()
+		if strings.HasPrefix(line, "mode:") {
+			continue
+		}
+		fields := strings.Fields(line)
+		if len(fields) < 3 {
+			continue
+		}
+		stmt, _ := strconv.Atoi(fields[len(fields)-2])
+		cnt, _ := strconv.Atoi(fields[len(fields)-1])
+		total += stmt
+		if cnt > 0 {
+			covered += stmt
+		}
+	}
+	if err := sc.Err(); err != nil {
+		return 0, err
+	}
+	if total == 0 {
+		return 0, nil
+	}
+	return float64(covered) / float64(total) * 100, nil
+}
+
+func runCoverage(profile string, min float64) int {
+	pct, err := coveragePercent(profile)
+	if err != nil {
+		fmt.Println("workflow: " + err.Error())
+		return 1
+	}
+	fmt.Printf("coverage: %.1f%% (min %.1f%%)\n", pct, min)
+	if pct < min {
+		fmt.Println("workflow: coverage below the floor")
+		return 1
+	}
+	return 0
+}
+
 // ---------- entry ----------
 
 func findRepoRoot() (string, error) {
@@ -963,7 +1014,8 @@ Usage:
   workflow ticket-start <id> [plan]
   workflow ticket-close <id> [plan]
   workflow commit-msg <path|-> 
-  workflow verify-commits [range]`)
+  workflow verify-commits [range]
+  workflow coverage <profile> [min]`)
 }
 
 func main() {
@@ -1020,6 +1072,18 @@ func main() {
 			rng = os.Args[2]
 		}
 		code = runVerifyCommits(repo, rng)
+	case "coverage":
+		if len(os.Args) < 3 {
+			usage()
+			os.Exit(1)
+		}
+		min := 60.0
+		if len(os.Args) > 3 {
+			if v, err := strconv.ParseFloat(os.Args[3], 64); err == nil {
+				min = v
+			}
+		}
+		code = runCoverage(os.Args[2], min)
 	default:
 		usage()
 		os.Exit(1)

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -92,5 +94,22 @@ func TestRenderPlanTickets(t *testing.T) {
 func TestNormalizeTrimsTrailingWhitespaceAndNewlines(t *testing.T) {
 	if normalize("a  \nb\t\n\n") != "a\nb" {
 		t.Fatalf("normalize = %q", normalize("a  \nb\t\n\n"))
+	}
+}
+
+func TestCoveragePercent(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "coverage.out")
+	content := "mode: atomic\n" +
+		"example.com/a.go:1.1,1.10 2 1\n" +
+		"example.com/a.go:2.1,2.10 2 0\n"
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	pct, err := coveragePercent(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if pct != 50 {
+		t.Fatalf("coveragePercent = %v, want 50", pct)
 	}
 }

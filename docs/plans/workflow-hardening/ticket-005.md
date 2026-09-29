@@ -2,7 +2,7 @@
 id: ticket-005
 title: Stronger quality gates
 plan: workflow-hardening
-status: todo
+status: done
 type: chore
 priority: medium
 estimate: S

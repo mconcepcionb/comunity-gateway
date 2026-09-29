@@ -20,10 +20,44 @@ tasks:
       - task: test
       - task: test:workflow
 
+  check:ci:
+    desc: Full CI gate (check + verify + console + govulncheck)
+    cmds:
+      - task: check
+      - task: verify
+      - task: console
+      - task: govulncheck
+
   test:workflow:
     desc: Test the workflow tool
     cmds:
       - '{{.GO}} test -C tools/workflow ./...'
+
+  govulncheck:
+    desc: Scan dependencies for known vulnerabilities
+    cmds:
+      - govulncheck ./...
+
+  coverage:
+    desc: 'Run tests with coverage and enforce a floor (COVERAGE_MIN, default 60)'
+    vars:
+      MIN: '{{.COVERAGE_MIN | default "60"}}'
+    cmds:
+      - '{{.GO}} test -race -coverprofile=coverage.out -covermode=atomic ./...'
+      - '{{.WORKFLOW}} coverage coverage.out {{.MIN}}'
+
+  console:
+    desc: Lint and typecheck the console (no-op when apps/console is absent)
+    cmds:
+      - |
+        if [ ! -d apps/console ]; then
+          echo "console: apps/console not present, skipping"
+          exit 0
+        fi
+        cd apps/console
+        if [ ! -d node_modules ]; then npm ci; fi
+        npx eslint .
+        npx tsc --noEmit
 
   fmt:
     desc: Format Go code
@@ -41,9 +75,9 @@ tasks:
       - '{{.GOLANGCI}} run'
 
   test:
-    desc: Run Go tests
+    desc: Run Go tests with the race detector
     cmds:
-      - '{{.GO}} test ./...'
+      - '{{.GO}} test -race ./...'
 
   build:
     desc: Build all packages
