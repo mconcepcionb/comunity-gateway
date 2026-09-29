@@ -88,6 +88,19 @@ must follow it (see `AGENTS.md`), and humans are expected to as well.
 - Append-only: never rewrite a past entry.
 - Create one with `task new-diary slug=...`; commit it with the session's final ticket commit.
 
+## Releases and versioning
+
+- One **unified CalVer** version for the whole monorepo: `vYYYY.MM.PATCH`. `PATCH` increments within
+  a month and resets to `0` on a new month (ADR-0018).
+- Releases are ad-hoc and **do not map to plans**; `meta` plans never release.
+- Git tags are the source of truth; `task build` injects the version via ldflags and the app exposes
+  it through an endpoint.
+- The HTTP API is versioned independently at `/api/v1`; a breaking change creates a new path version.
+- There is no product-level compatibility promise yet — the API path version is the boundary.
+- `task release` computes the next version, requires a clean tree and green gates, tags, regenerates
+  the changelog and pushes the tag when a remote exists. `task release:dryrun` previews;
+  `task version` / `task version:next` print the current and next versions.
+
 ## Quality gates
 
 `task check` runs `fmt` + `vet` + `lint` + `test` (with `-race`) and the workflow tool's tests.
@@ -114,6 +127,10 @@ task ticket:close  id=... [plan=...]
 task hooks:install # install the commit-msg hook
 task verify:commits range=origin/main..HEAD
 task changelog     # regenerate CHANGELOG.md (needs git-cliff)
+task version       # current version from git tags
+task version:next  # next CalVer
+task release       # cut a release
+task release:dryrun
 task new-adr       title="..."
 task new-plan      name=... title="..."
 task new-ticket    plan=... title="..."

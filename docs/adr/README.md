@@ -19,3 +19,4 @@
 | ADR-0015 | English for code and documentation | accepted | 2026-09-29 |  |
 | ADR-0016 | Repository engineering workflow | superseded | 2026-09-29 | ADR-0017 |
 | ADR-0017 | Task (go-task) as the repository task runner | accepted | 2026-09-29 |  |
+| ADR-0018 | Unified CalVer versioning | accepted | 2026-09-29 |  |

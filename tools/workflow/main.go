@@ -24,6 +24,7 @@ var (
 	reKey        = regexp.MustCompile(`^([A-Za-z0-9_]+):(.*)$`)
 	reRegular    = regexp.MustCompile(`^(feat|fix|refactor|docs|chore|test|spike|perf|build|ci|style)(\([^)]+\))?!?: .+`)
 	reTicketRef  = regexp.MustCompile(`\(ticket-\d{3}\)`)
+	reCalVer     = regexp.MustCompile(`^v(\d{4})\.(\d{2})\.(\d+)$`)
 
 	ticketStatuses = set("todo", "in_progress", "review", "blocked", "done", "cancelled")
 	ticketTypes    = set("feat", "fix", "refactor", "docs", "chore", "test", "spike")
@@ -985,6 +986,124 @@ func runCoverage(profile string, min float64) int {
 	return 0
 }
 
+// ---------- versioning and release ----------
+
+func gitOutput(repo string, args ...string) string {
+	full := append([]string{"-C", repo}, args...)
+	out, _ := exec.Command("git", full...).Output()
+	return string(out)
+}
+
+func latestTag(repo string) string {
+	out := gitOutput(repo, "for-each-ref", "--sort=-creatordate", "--format=%(refname:short)", "refs/tags")
+	for _, line := range strings.Split(strings.TrimSpace(out), "\n") {
+		line = strings.TrimSpace(line)
+		if reCalVer.MatchString(line) {
+			return line
+		}
+	}
+	return ""
+}
+
+func currentVersion(repo string) string {
+	if t := latestTag(repo); t != "" {
+		return t
+	}
+	return "v0.0.0-dev"
+}
+
+func nextCalVer(lastTag string, now time.Time) string {
+	y, m := now.Year(), int(now.Month())
+	patch := 0
+	if mm := reCalVer.FindStringSubmatch(lastTag); mm != nil {
+		ly, _ := strconv.Atoi(mm[1])
+		lm, _ := strconv.Atoi(mm[2])
+		lp, _ := strconv.Atoi(mm[3])
+		if ly == y && lm == m {
+			patch = lp + 1
+		}
+	}
+	return fmt.Sprintf("v%04d.%02d.%d", y, m, patch)
+}
+
+func runVersion(repo string, next bool) int {
+	if next {
+		fmt.Println(nextCalVer(latestTag(repo), time.Now()))
+	} else {
+		fmt.Println(currentVersion(repo))
+	}
+	return 0
+}
+
+func runExternal(repo, name string, args ...string) int {
+	c := exec.Command(name, args...)
+	c.Dir = repo
+	c.Stdin = os.Stdin
+	c.Stdout = os.Stdout
+	c.Stderr = os.Stderr
+	if err := c.Run(); err != nil {
+		fmt.Printf("workflow: %s %s failed\n", name, strings.Join(args, " "))
+		return 1
+	}
+	return 0
+}
+
+func remoteExists(repo, name string) bool {
+	return strings.Contains(gitOutput(repo, "remote"), name)
+}
+
+func runRelease(repo string, dryRun bool) int {
+	next := nextCalVer(latestTag(repo), time.Now())
+	if dryRun {
+		fmt.Printf("current: %s\nnext:    %s\n", currentVersion(repo), next)
+		return 0
+	}
+	if strings.TrimSpace(gitOutput(repo, "status", "--porcelain")) != "" {
+		fmt.Println("workflow: working tree is dirty; commit or stash first")
+		return 1
+	}
+	if code := runExternal(repo, "task", "check"); code != 0 {
+		return code
+	}
+	if code := runExternal(repo, "task", "verify"); code != 0 {
+		return code
+	}
+
+	if _, err := exec.LookPath("git-cliff"); err == nil {
+		c := exec.Command("git-cliff", "-o", "CHANGELOG.md")
+		c.Dir = repo
+		if err := c.Run(); err != nil {
+			fmt.Println("workflow: git-cliff failed: " + err.Error())
+			return 1
+		}
+		if strings.TrimSpace(gitOutput(repo, "status", "--porcelain", "--", "CHANGELOG.md")) != "" {
+			_ = exec.Command("git", "-C", repo, "add", "CHANGELOG.md").Run()
+			_ = exec.Command("git", "-C", repo, "commit", "-m", "chore(release): "+next+" [no-ticket]").Run()
+		}
+	} else {
+		fmt.Println("workflow: git-cliff not found; skipping changelog")
+	}
+
+	flag := "-a"
+	if strings.TrimSpace(gitOutput(repo, "config", "--get", "user.signingkey")) != "" {
+		flag = "-s"
+	}
+	if err := exec.Command("git", "-C", repo, "tag", flag, next, "-m", "Release "+next).Run(); err != nil {
+		fmt.Println("workflow: git tag failed: " + err.Error())
+		return 1
+	}
+	fmt.Printf("tagged %s\n", next)
+
+	if remoteExists(repo, "origin") {
+		_ = exec.Command("git", "-C", repo, "push", "origin", "HEAD").Run()
+		_ = exec.Command("git", "-C", repo, "push", "origin", next).Run()
+		fmt.Println("pushed HEAD and tag to origin")
+	} else {
+		fmt.Println("workflow: no 'origin' remote; tag created locally only")
+	}
+	return 0
+}
+
 // ---------- entry ----------
 
 func findRepoRoot() (string, error) {
@@ -1015,7 +1134,9 @@ Usage:
   workflow ticket-close <id> [plan]
   workflow commit-msg <path|-> 
   workflow verify-commits [range]
-  workflow coverage <profile> [min]`)
+  workflow coverage <profile> [min]
+  workflow version [--next]
+  workflow release [--dry-run]`)
 }
 
 func main() {
@@ -1084,6 +1205,22 @@ func main() {
 			}
 		}
 		code = runCoverage(os.Args[2], min)
+	case "version":
+		next := false
+		for _, a := range os.Args[2:] {
+			if a == "--next" {
+				next = true
+			}
+		}
+		code = runVersion(repo, next)
+	case "release":
+		dryRun := false
+		for _, a := range os.Args[2:] {
+			if a == "--dry-run" {
+				dryRun = true
+			}
+		}
+		code = runRelease(repo, dryRun)
 	default:
 		usage()
 		os.Exit(1)

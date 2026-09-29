@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestParseFrontmatterScalarsListsAndMultiline(t *testing.T) {
@@ -111,5 +112,23 @@ func TestCoveragePercent(t *testing.T) {
 	}
 	if pct != 50 {
 		t.Fatalf("coveragePercent = %v, want 50", pct)
+	}
+}
+
+func TestNextCalVer(t *testing.T) {
+	sep := time.Date(2026, 9, 15, 0, 0, 0, 0, time.UTC)
+	tests := []struct {
+		last string
+		want string
+	}{
+		{"", "v2026.09.0"},
+		{"v2026.09.3", "v2026.09.4"},
+		{"v2026.08.2", "v2026.09.0"},
+		{"v2025.09.9", "v2026.09.0"},
+	}
+	for _, tt := range tests {
+		if got := nextCalVer(tt.last, sep); got != tt.want {
+			t.Fatalf("nextCalVer(%q) = %q, want %q", tt.last, got, tt.want)
+		}
 	}
 }

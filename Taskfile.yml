@@ -80,9 +80,9 @@ tasks:
       - '{{.GO}} test -race ./...'
 
   build:
-    desc: Build all packages
+    desc: Build all packages (injects the version)
     cmds:
-      - '{{.GO}} build ./...'
+      - 'V=$({{.WORKFLOW}} version) {{.GO}} build -ldflags "-X main.version=$V" ./...'
 
   run:
     desc: Run the gateway
@@ -137,6 +137,26 @@ tasks:
     desc: Regenerate CHANGELOG.md with git-cliff
     cmds:
       - git-cliff -o CHANGELOG.md
+
+  version:
+    desc: Print the current version (from git tags)
+    cmds:
+      - '{{.WORKFLOW}} version'
+
+  version:next:
+    desc: Print the next CalVer version
+    cmds:
+      - '{{.WORKFLOW}} version --next'
+
+  release:
+    desc: Cut a CalVer release (requires a clean tree and green gates)
+    cmds:
+      - '{{.WORKFLOW}} release'
+
+  release:dryrun:
+    desc: Preview the next release version
+    cmds:
+      - '{{.WORKFLOW}} release --dry-run'
 
   new-adr:
     desc: 'Create an ADR: task new-adr title="..."'
