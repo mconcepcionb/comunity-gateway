@@ -50,7 +50,7 @@ gate, and a defined home for meta/tooling work.
 | ticket-001 | Add meta plan kind and spike output rule | done |  |
 | ticket-002 | Workflow validator and index generation | done | ticket-001 |
 | ticket-003 | Ticket lifecycle helpers | done | ticket-002 |
-| ticket-004 | Commit hooks and changelog | todo | ticket-002 |
+| ticket-004 | Commit hooks and changelog | done | ticket-002 |
 | ticket-005 | Stronger quality gates | todo | ticket-002 |
 | ticket-006 | Slim AGENTS.md and adopt ADR index | todo | ticket-002 |
 

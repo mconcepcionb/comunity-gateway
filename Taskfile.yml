@@ -89,6 +89,21 @@ tasks:
     cmds:
       - '{{.WORKFLOW}} ticket-close "{{.id}}" "{{.plan | default ""}}"'
 
+  hooks:install:
+    desc: Install git hooks (sets core.hooksPath to .githooks)
+    cmds:
+      - git config core.hooksPath .githooks
+
+  verify:commits:
+    desc: 'Validate commit messages in a range (default: HEAD)'
+    cmds:
+      - '{{.WORKFLOW}} verify-commits "{{.range | default ""}}"'
+
+  changelog:
+    desc: Regenerate CHANGELOG.md with git-cliff
+    cmds:
+      - git-cliff -o CHANGELOG.md
+
   new-adr:
     desc: 'Create an ADR: task new-adr title="..."'
     requires:

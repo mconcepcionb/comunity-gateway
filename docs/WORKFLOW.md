@@ -72,6 +72,10 @@ must follow it (see `AGENTS.md`), and humans are expected to as well.
 - The commit contains: the code, its tests, the ticket file (status set to `done`), the plan index
   update, any ADR the ticket produced, and the diary entry if it is the session's last ticket.
 - Commit only when the ticket's Definition of Done and Quality Gates are checked.
+- Enforce the format with the `commit-msg` hook: install it once with `task hooks:install`, and use
+  `task verify:commits range=origin/main..HEAD` in CI. Merge/revert commits are exempt; use an
+  explicit `[no-ticket]` for other genuine exceptions.
+- `task changelog` regenerates `CHANGELOG.md` from history with git-cliff.
 
 ## Diary
 
@@ -99,6 +103,9 @@ task plan:sync     # regenerate plan indexes
 task adr:index     # regenerate the ADR index
 task ticket:start  id=... [plan=...]
 task ticket:close  id=... [plan=...]
+task hooks:install # install the commit-msg hook
+task verify:commits range=origin/main..HEAD
+task changelog     # regenerate CHANGELOG.md (needs git-cliff)
 task new-adr       title="..."
 task new-plan      name=... title="..."
 task new-ticket    plan=... title="..."

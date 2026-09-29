@@ -2,7 +2,7 @@
 id: ticket-004
 title: Commit hooks and changelog
 plan: workflow-hardening
-status: todo
+status: done
 type: chore
 priority: medium
 estimate: M

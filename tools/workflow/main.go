@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -879,7 +881,13 @@ func validateCommitMessage(msg string) []string {
 }
 
 func runCommitMsg(path string) int {
-	raw, err := os.ReadFile(path)
+	var raw []byte
+	var err error
+	if path == "-" {
+		raw, err = io.ReadAll(os.Stdin)
+	} else {
+		raw, err = os.ReadFile(path)
+	}
 	if err != nil {
 		fmt.Println("workflow: " + err.Error())
 		return 1
@@ -890,6 +898,39 @@ func runCommitMsg(path string) int {
 		}
 		return 1
 	}
+	return 0
+}
+
+func runVerifyCommits(repo, rng string) int {
+	if rng == "" {
+		rng = "-1"
+	}
+	out, err := exec.Command("git", "-C", repo, "log", "--format=%H%x09%s", rng).Output()
+	if err != nil {
+		fmt.Println("workflow: git log failed: " + err.Error())
+		return 1
+	}
+	fail := 0
+	for _, line := range strings.Split(strings.TrimSpace(string(out)), "\n") {
+		if line == "" {
+			continue
+		}
+		parts := strings.SplitN(line, "\t", 2)
+		hash, subj := parts[0], ""
+		if len(parts) > 1 {
+			subj = parts[1]
+		}
+		if errs := validateCommitMessage(subj); len(errs) > 0 {
+			fail++
+			for _, e := range errs {
+				fmt.Printf("workflow: %.8s: %s\n", hash, e)
+			}
+		}
+	}
+	if fail > 0 {
+		return 1
+	}
+	fmt.Println("workflow: commits OK")
 	return 0
 }
 
@@ -921,7 +962,8 @@ Usage:
   workflow adr-index
   workflow ticket-start <id> [plan]
   workflow ticket-close <id> [plan]
-  workflow commit-msg <path>`)
+  workflow commit-msg <path|-> 
+  workflow verify-commits [range]`)
 }
 
 func main() {
@@ -972,6 +1014,12 @@ func main() {
 			os.Exit(1)
 		}
 		code = runCommitMsg(os.Args[2])
+	case "verify-commits":
+		rng := ""
+		if len(os.Args) > 2 {
+			rng = os.Args[2]
+		}
+		code = runVerifyCommits(repo, rng)
 	default:
 		usage()
 		os.Exit(1)

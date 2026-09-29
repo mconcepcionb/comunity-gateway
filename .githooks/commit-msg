@@ -1,0 +1,4 @@
+#!/bin/sh
+# Commit-msg hook: enforce Conventional Commits and a ticket reference.
+# Install with: task hooks:install
+exec go run ./tools/workflow/main.go commit-msg "$1"
