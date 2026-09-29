@@ -1,0 +1,96 @@
+package main
+
+import (
+	"strings"
+	"testing"
+)
+
+func TestParseFrontmatterScalarsListsAndMultiline(t *testing.T) {
+	lines := []string{
+		"id: ticket-001",
+		"depends_on: [ticket-002, ticket-003]",
+		"related_adrs:",
+		"  [ADR-0001, ADR-0002,",
+		"   ADR-0003]",
+		`title: "Hello: world"`,
+		"empty:",
+		"tags:",
+		"  - a",
+		"  - b",
+		"finding:",
+	}
+	fm := parseFrontmatter(lines)
+
+	if got := fm.get("id"); got != "ticket-001" {
+		t.Fatalf("id = %q", got)
+	}
+	if got := fm.get("title"); got != "Hello: world" {
+		t.Fatalf("title = %q", got)
+	}
+	if got := fm.list("depends_on"); strings.Join(got, ",") != "ticket-002,ticket-003" {
+		t.Fatalf("depends_on = %v", got)
+	}
+	if got := fm.list("related_adrs"); strings.Join(got, ",") != "ADR-0001,ADR-0002,ADR-0003" {
+		t.Fatalf("related_adrs = %v", got)
+	}
+	if got := fm.list("tags"); strings.Join(got, ",") != "a,b" {
+		t.Fatalf("tags = %v", got)
+	}
+	if got := fm.get("finding"); got != "" {
+		t.Fatalf("finding = %q, want empty", got)
+	}
+}
+
+func TestSplitList(t *testing.T) {
+	got := splitList("ADR-0001, ADR-0002 ,ADR-0003")
+	if strings.Join(got, "|") != "ADR-0001|ADR-0002|ADR-0003" {
+		t.Fatalf("splitList = %v", got)
+	}
+	if len(splitList("  ")) != 0 {
+		t.Fatal("expected empty list")
+	}
+}
+
+func TestValidateCommitMessage(t *testing.T) {
+	tests := []struct {
+		name    string
+		msg     string
+		wantErr bool
+	}{
+		{"valid with scope", "feat(games): add adapter (ticket-010)", false},
+		{"valid no scope", "docs: update readme (ticket-019)", false},
+		{"no ticket ref", "chore: bootstrap the repo", true},
+		{"no-ticket escape hatch", "chore: bootstrap the repo [no-ticket]", false},
+		{"not conventional", "updated stuff (ticket-001)", true},
+		{"merge", "Merge branch 'main'", false},
+		{"revert", "Revert \"feat: x (ticket-001)\"", false},
+		{"empty", "   ", true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			errs := validateCommitMessage(tt.msg)
+			if (len(errs) > 0) != tt.wantErr {
+				t.Fatalf("validateCommitMessage(%q) errs=%v wantErr=%v", tt.msg, errs, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestRenderPlanTickets(t *testing.T) {
+	tickets := []ticket{
+		{fm: frontmatter{scalars: map[string]string{"id": "ticket-001", "title": "First", "status": "done"}, lists: map[string][]string{}}},
+		{fm: frontmatter{scalars: map[string]string{"id": "ticket-002", "title": "Second", "status": "todo"}, lists: map[string][]string{"depends_on": {"ticket-001"}}}},
+	}
+	out := renderPlanTickets(tickets)
+	for _, want := range []string{"| ticket-001 | First | done |  |", "| ticket-002 | Second | todo | ticket-001 |"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("renderPlanTickets missing %q in:\n%s", want, out)
+		}
+	}
+}
+
+func TestNormalizeTrimsTrailingWhitespaceAndNewlines(t *testing.T) {
+	if normalize("a  \nb\t\n\n") != "a\nb" {
+		t.Fatalf("normalize = %q", normalize("a  \nb\t\n\n"))
+	}
+}

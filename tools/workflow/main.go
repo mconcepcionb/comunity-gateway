@@ -829,6 +829,9 @@ func runTicketStart(repo, id, planName string) int {
 		return 1
 	}
 	_ = setField(t.path, "updated", today)
+	if code := runPlanSync(repo, t.plan()); code != 0 {
+		return code
+	}
 	fmt.Printf("started %s\n", rel(repo, t.path))
 	return 0
 }

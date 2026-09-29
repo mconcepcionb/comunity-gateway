@@ -2,7 +2,7 @@
 id: ticket-003
 title: Ticket lifecycle helpers
 plan: workflow-hardening
-status: todo
+status: done
 type: feat
 priority: medium
 estimate: M

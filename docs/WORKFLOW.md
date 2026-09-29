@@ -56,6 +56,8 @@ must follow it (see `AGENTS.md`), and humans are expected to as well.
 - **Spike output rule:** a `spike` ticket may only reach `done` if it produced a decision — a linked
   ADR in `related_adr`, or a finding at `docs/plans/<plan>/findings/<id>.md` declared in the
   `finding` field.
+- Start and close with `task ticket:start id=... [plan=...]` and `task ticket:close id=...`; start
+  refuses if a dependency is not `done`, and close updates the plan index for you.
 - Create one with `task new-ticket plan=<plan-name> title="..."`.
 
 ## Commits
@@ -91,15 +93,19 @@ Go 1.27+, `golangci-lint` v2, [Task](https://taskfile.dev) (go-task), Node 26+, 
 ```
 task               # list tasks
 task check         # fmt + vet + lint + test
-task fmt vet lint test
-task build run tidy
+task fmt vet lint test build run tidy
+task verify        # validate workflow artifacts
+task plan:sync     # regenerate plan indexes
+task adr:index     # regenerate the ADR index
+task ticket:start  id=... [plan=...]
+task ticket:close  id=... [plan=...]
 task new-adr       title="..."
 task new-plan      name=... title="..."
 task new-ticket    plan=... title="..."
 task new-diary     slug=...
 ```
 
-CI mirrors `task check`.
+CI mirrors `task check` and `task verify`.
 
 ## Directory conventions
 

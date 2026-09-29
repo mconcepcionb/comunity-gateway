@@ -18,6 +18,12 @@ tasks:
       - task: vet
       - task: lint
       - task: test
+      - task: test:workflow
+
+  test:workflow:
+    desc: Test the workflow tool
+    cmds:
+      - '{{.GO}} test -C tools/workflow ./...'
 
   fmt:
     desc: Format Go code
@@ -68,6 +74,20 @@ tasks:
     desc: Regenerate docs/adr/README.md
     cmds:
       - '{{.WORKFLOW}} adr-index'
+
+  ticket:start:
+    desc: 'Start a ticket: task ticket:start id=... [plan=...]'
+    requires:
+      vars: [id]
+    cmds:
+      - '{{.WORKFLOW}} ticket-start "{{.id}}" "{{.plan | default ""}}"'
+
+  ticket:close:
+    desc: 'Close a ticket: task ticket:close id=... [plan=...]'
+    requires:
+      vars: [id]
+    cmds:
+      - '{{.WORKFLOW}} ticket-close "{{.id}}" "{{.plan | default ""}}"'
 
   new-adr:
     desc: 'Create an ADR: task new-adr title="..."'
