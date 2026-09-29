@@ -20,6 +20,7 @@ must follow it (see `AGENTS.md`), and humans are expected to as well.
 | ADR      | `docs/adr/NNNN-<slug>.md`             | `docs/templates/adr.md`  | Immutable once accepted       |
 | Plan     | `docs/plans/<plan-name>/README.MD`    | `docs/templates/plan.md` | Living until the plan closes  |
 | Ticket   | `docs/plans/<plan-name>/ticket-NNN.md`| `docs/templates/ticket.md`| Atomic, status-tracked       |
+| Finding  | `docs/plans/<plan>/findings/<id>.md`  | `docs/templates/finding.md`| Output of a spike            |
 | Diary    | `docs/diary/entry-YYYY-MM-DD-<slug>.md`| `docs/templates/diary.md`| Append-only, one per session  |
 
 ## ADRs (Architecture Decision Records)
@@ -36,7 +37,10 @@ must follow it (see `AGENTS.md`), and humans are expected to as well.
 
 - A plan is a bounded body of work with a goal and a plan-level Definition of Done.
 - Lives at `docs/plans/<plan-name>/README.MD`; the plan name is kebab-case.
-- Contains a **ticket index table** that must stay current as tickets change status.
+- Has a `kind`: `product` for feature work, `meta` for tooling, workflow and documentation. Meta
+  work is the **only** exception to "no implementation outside a product plan".
+- Contains a **ticket index table** that is **generated** from ticket frontmatter — never edit it by
+  hand; run `task plan:sync`.
 - A plan is `draft` until reviewed, then `active`, then `done`.
 - Create one with `task new-plan name=... title="..."`.
 
@@ -49,6 +53,9 @@ must follow it (see `AGENTS.md`), and humans are expected to as well.
   **Quality Gates** (checklist), **Notes**.
 - Status lifecycle: `todo` → `in_progress` → `review` → `done` (or `blocked` / `cancelled`).
 - A ticket is **not started until its `depends_on` tickets are `done`**.
+- **Spike output rule:** a `spike` ticket may only reach `done` if it produced a decision — a linked
+  ADR in `related_adr`, or a finding at `docs/plans/<plan>/findings/<id>.md` declared in the
+  `finding` field.
 - Create one with `task new-ticket plan=<plan-name> title="..."`.
 
 ## Commits

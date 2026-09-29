@@ -8,6 +8,7 @@ priority: medium        # low | medium | high | critical
 estimate: S             # XS | S | M | L | XL
 depends_on: []
 related_adr: []
+finding:                # spike only: path to docs/plans/<plan>/findings/<id>.md
 created: YYYY-MM-DD
 updated: YYYY-MM-DD
 tags: []

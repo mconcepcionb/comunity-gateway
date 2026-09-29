@@ -1,6 +1,7 @@
 ---
 id: <plan-name>
 title: <Plan title>
+kind: product           # product | meta
 status: draft           # draft | active | done
 owner: marce
 created: YYYY-MM-DD

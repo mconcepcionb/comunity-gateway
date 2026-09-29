@@ -1,6 +1,7 @@
 ---
 id: mvp-foundation
 title: MVP Foundation
+kind: product
 status: active
 owner: marce
 created: 2026-09-29
