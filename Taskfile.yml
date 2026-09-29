@@ -1,0 +1,80 @@
+version: '3'
+
+vars:
+  GO: '{{.GO | default "go"}}'
+  GOLANGCI: '{{.GOLANGCI | default "golangci-lint"}}'
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+
+  check:
+    desc: Run every quality gate (fmt + vet + lint + test)
+    cmds:
+      - task: fmt
+      - task: vet
+      - task: lint
+      - task: test
+
+  fmt:
+    desc: Format Go code
+    cmds:
+      - '{{.GO}} fmt ./...'
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - '{{.GO}} vet ./...'
+
+  lint:
+    desc: Run golangci-lint
+    cmds:
+      - '{{.GOLANGCI}} run'
+
+  test:
+    desc: Run Go tests
+    cmds:
+      - '{{.GO}} test ./...'
+
+  build:
+    desc: Build all packages
+    cmds:
+      - '{{.GO}} build ./...'
+
+  run:
+    desc: Run the gateway
+    cmds:
+      - '{{.GO}} run ./cmd/gateway'
+
+  tidy:
+    desc: Tidy go.mod
+    cmds:
+      - '{{.GO}} mod tidy'
+
+  new-adr:
+    desc: 'Create an ADR: task new-adr title="..."'
+    requires:
+      vars: [title]
+    cmds:
+      - 'bash scripts/new-adr.sh "{{.title}}"'
+
+  new-plan:
+    desc: 'Create a plan: task new-plan name=... title="..."'
+    requires:
+      vars: [name]
+    cmds:
+      - 'bash scripts/new-plan.sh "{{.name}}" "{{.title | default .name}}"'
+
+  new-ticket:
+    desc: 'Create a ticket: task new-ticket plan=... title="..."'
+    requires:
+      vars: [plan, title]
+    cmds:
+      - 'bash scripts/new-ticket.sh "{{.plan}}" "{{.title}}"'
+
+  new-diary:
+    desc: 'Create a diary entry: task new-diary slug=...'
+    cmds:
+      - 'bash scripts/new-diary.sh "{{.slug | default "session"}}"'

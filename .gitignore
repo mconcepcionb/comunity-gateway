@@ -1,0 +1,23 @@
+# Go
+/bin/
+*.exe
+*.test
+*.out
+coverage.*
+
+# Node
+node_modules/
+.next/
+dist/
+*.log
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
